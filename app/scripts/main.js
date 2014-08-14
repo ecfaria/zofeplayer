@@ -1,3 +1,4 @@
+
 /*!
  *
  *  Web Starter Kit
@@ -48,3 +49,100 @@
     }
   });
 })();
+
+
+(function (){
+  var i = 0;
+  var podcastID, podcastTitle, podcastDescription;
+  var playButton = document.getElementById("play");
+  var pauseButton = document.getElementById("pause");
+  var nextButton = document.getElementById("next");
+  var stopButton = document.getElementById("stop");
+
+  SC.initialize({
+    client_id: "cd8eb15c60bad19fff81da4d11951557",
+  });
+
+  // Open JSON
+  function loadJSON() {
+    var data_file = "https://api.soundcloud.com/users/zofepod/tracks.json?client_id=cd8eb15c60bad19fff81da4d11951557";
+    var http_request = new XMLHttpRequest();
+    try{
+      // Opera 8.0+, Firefox, Chrome, Safari
+      http_request = new XMLHttpRequest();
+    }catch (e){
+      // Internet Explorer Browsers
+      try{
+        http_request = new ActiveXObject("Msxml2.XMLHTTP");
+      }catch (e) {
+        try{
+          http_request = new ActiveXObject("Microsoft.XMLHTTP");
+          }catch (e){
+            // Something went wrong
+            alert("Your browser broke!");
+            return false;
+          }
+      }
+    }
+
+    http_request.onreadystatechange  = function(){
+
+      if (http_request.readyState == 4  ) {
+
+        // Javascript function JSON.parse to parse JSON data
+        var jsonObj = JSON.parse(http_request.responseText);
+        
+        createPodcast(jsonObj);
+      }
+    
+    }
+    
+    http_request.open("GET", data_file, true);
+    http_request.send();
+
+  }
+
+  function createPodcast(data) {
+    podcastTotal = data.length;
+    var podcastID = data[i].id;
+    var podcastTitle = data[i].title;
+    var podcastDescription = data[i].description;
+
+    playPodcast(podcastID);
+    infoPodcast(podcastTitle, podcastDescription);
+  }
+
+  function playPodcast(id) {
+    SC.stream("/tracks/"+id, function(sound){
+      // ontimedcomments: function(comments){
+      //   console.log(comments[0].body);
+      // };
+
+      sound.play();
+
+      playButton.onclick = function(){
+        sound.play();
+      }
+
+      pauseButton.onclick = function(){
+        sound.pause();
+      }
+
+      nextButton.onclick = function(){
+        i += i;
+        playPodcast(i);
+      }
+
+
+    });
+  }
+
+  function infoPodcast(title,description){
+    document.getElementById("zofe-title").innerHTML = title;
+    document.getElementById("zofe-description").innerHTML = description;
+  }
+
+  loadJSON();
+
+
+})()
